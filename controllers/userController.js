@@ -127,3 +127,74 @@ exports.calculateTotalPrice = async (req, res, next) =>{
   }
   res.status(200).json({success:"true", totalCost:price});
 }
+
+exports.bookAppointment = async(req, res)=>{
+  try {
+    const { userid, productid, location, appointmentDate, appointmentTime } =
+      req.body;
+
+    const user = await UserModel.findOne({ _id: userid });
+    if (!user) {
+      return res.status(200).json({ msg: 'no user with such userid' });
+    }
+    let flag = false;
+    for (let i = 0; i < user.book.length; i++) {
+      if (user.book[i].id == productid) {
+        flag = true;
+        break;
+      }
+    }
+    if (flag == true) {
+      return res.status(200).json({ msg: 'Appointment already booked' });
+    }
+    user.book.push({
+      id: productid,
+      location,
+      appointmentDate,
+      appointmentTime,
+    });
+    user.save();
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(401).json({ msg: 'bad request', error: error.message });
+  }
+}
+
+exports.cancelAppointment = async(req, res)=>{
+  const {userid, productid} = req.body;
+  try {
+    const user = await UserModel.findOne({_id:userid});
+    if(!user){
+      return res.status(200).json({msg:"no such user"});
+    }
+    let flag = false;
+    for(let i=0; i<user.book.length; i++){
+      if(user.book[i].id == productid){
+        await UserModel.updateOne(
+          { _id: userid },
+          { $pull: { book: { id: productid } } }
+        );
+        flag = true;
+        break;
+      }
+    }
+    if(flag == false){
+      return res.status(200).json({msg:"No such product booked by the user"});
+    }
+    res.status(200).json({msg:"appointment cancelled successfully"});
+  } catch (error) {
+    console.log(error);
+    res.status(401).json({ msg: 'bad request', error: error.message });
+  }
+}
+
+exports.getAllAppointments = async(req, res)=>{
+  const {userid} = req.body;
+  const user = await UserModel.findOne({_id:userid});
+  if(!user){
+    return res.status(200).json({msg:"No such user found"});
+  }
+  const book = user.book;
+  res.status(200).json({length:book.length, book});
+}

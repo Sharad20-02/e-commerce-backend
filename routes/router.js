@@ -5,6 +5,9 @@ const {
   addToCart,
   removeFromCart,
   calculateTotalPrice,
+  bookAppointment,
+  cancelAppointment,
+  getAllAppointments,
 } = require('../controllers/userController');
 const {
   addProduct,
@@ -19,6 +22,9 @@ router.post('/user/register', register);
 router.post('/user/addtocart', addToCart);
 router.post('/user/removefromcart', removeFromCart);
 router.post('/user/totalprice', calculateTotalPrice);
+router.post('/user/bookAppointment', bookAppointment);
+router.post('/user/cancelAppointment', cancelAppointment);
+router.post('/user/getAllAppointments', getAllAppointments);
 
 router.post('/product/add', addProduct);
 router.post('/product/filter', filterProducts);

@@ -6,6 +6,17 @@ const cartSchema = new mongoose.Schema({
   quantity: Number,
 });
 
+const bookSchema = new mongoose.Schema({
+  id:String,
+  location: String,
+  bookedOn: {
+    type:Date,
+    default: Date.now()
+  },
+  appointmentDate:String,
+  appointmentTime:String,
+});
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -21,6 +32,7 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   cart: [cartSchema],
+  book:[bookSchema]
 });
 
 userSchema.pre('save', async function (next) {
